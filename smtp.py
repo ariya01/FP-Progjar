@@ -1,21 +1,27 @@
 import smtplib
 import imaplib
-import Tkinter
+import Tkinter, tkFileDialog
 from Tkinter import *
 import ttk
 import email as daftarEmail
 import datetime
 import tkMessageBox
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+import Image, ImageTk
 
 global T
 global email
 global T1
 global passwd
 global server
+global attach
 email = ""
 passwd = ""
 server = ""
-
+attach = ""
 def storeUser():
     global email
     global passwd
@@ -53,19 +59,49 @@ def inbox():
         process_mailbox(M)  # ... do something with emails, see below ...
         M.close()
 
+def attachment():
+    global attach
+    attach = tkFileDialog.askopenfilename(parent=tab2, title='Choose a file')
+    tkMessageBox.showinfo("Success", "File siap dikirim.")
+    return attach
+        # print "I got %d bytes from this file." % len(data)
+
 def send():
     global email
     global server
     global subject
+    global attach
 
     pesan = T3.get('1.0',END)
     alamat = T2.get()
     subject = T5.get()
     hihi=0
-    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (email, ", ".join(alamat), subject, pesan)
+
+    msg = MIMEMultipart()
+    msg['From'] = email
+    msg['To'] = alamat
+    msg['Subject'] = subject
+
+    body = pesan
+    msg.attach(MIMEText(body, 'plain'))
+
+    filename = attach
+    if filename:
+        attachment = open(filename, 'rb')
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', "attachment; filename= " + filename)
+        msg.attach(part)
+
+
+
+    text = msg.as_string()
+
+    # message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    # """ % (email, ", ".join(alamat), subject, pesan)
     try:
-        server.sendmail(email, alamat, message)
+        server.sendmail(email, alamat, text)
 
     except:
         tkMessageBox.showinfo("Error", "Email Penerima Salah.")
@@ -73,13 +109,16 @@ def send():
 
     if hihi==0:
         tkMessageBox.showinfo("Success", "Email Terkirim")
+        attach=''
+
+    return attach
 
 def process_mailbox(M):
     rv, data = M.search(None, "ALL")
     if rv != 'OK':
         print "No messages found!"
         return
-    #print data[0].split()
+    # full = daftarEmail.message_from_string(data[0][1])
     emailena = len(data[0].split()) - 7
     print emailena
     roww = 0
@@ -100,6 +139,14 @@ def process_mailbox(M):
         # enter = Tkinter.label
         content = Tkinter.Label(tab3, text='SUBJECT:\t' + msg['Subject'] + '\n', font=("arial", 8, "bold"))
         content.grid(sticky=W)
+        # msg.as_string()
+        # str(msg)
+        # print(str(msg))
+
+        # content2 = Tkinter.Label(tab3, text=str(msg) + '\n', font=("arial", 8, "bold"))
+        # content2.grid(sticky=W)
+
+
         ttk.Separator(tab3, orient='horizontal').grid(columnspan=2, sticky='ew')
         print 'Message %s: %s' % (num, msg['Subject'])
         print 'Raw Date:', msg['Date']
@@ -110,6 +157,7 @@ def process_mailbox(M):
                 daftarEmail.utils.mktime_tz(date_tuple))
             print "Local Date:", \
                 local_date.strftime("%a, %d %b %Y %H:%M:%S")
+
 
 
 master= Tk()
@@ -146,11 +194,21 @@ T5 = Entry(tab2,width=30)
 T5.pack()
 kosongan= Tkinter.Label(tab2,text="",font=("arial",5,"bold")).pack()
 tklabel3= Tkinter.Label(tab2,text="Masukan Pesan",font=("arial",14,"bold")).pack()
-T3 = Text(tab2,width=40,height=15)
+T3 = Text(tab2,width=40,height=10)
 T3.pack()
+work2 = Tkinter.Button(tab2,text = 'Attachment',bg='#2ecc71', command=attachment,width=5,height=1).pack()
 work2 = Tkinter.Button(tab2,text = 'Kirim',bg='#2ecc71', command=send,width=5,height=1).pack()
 # kosongan= Tkinter.Label(tab2,text="",font=("arial",14,"bold")).pack()
 
+#TAB ABOUT
+loginTitle= Tkinter.Label(tab4,text="\nABOUT\n",font=("verdana",20,"bold")).pack()
+img = ImageTk.PhotoImage(Image.open('tc.jpg'))
+# panel = Tkinter.Label(tab4, image = img).pack()
+
+tklabel5= Tkinter.Label(tab4,text="Faturrahman M\t\t(05111540000027)",font=("arial",14,"bold")).pack()
+tklabel5= Tkinter.Label(tab4,text="Julian Enggarrio PP\t(05111540000082)",font=("arial",14,"bold")).pack()
+tklabel5= Tkinter.Label(tab4,text="Ariya Wildan Devanto\t(05111540000123)",font=("arial",14,"bold")).pack()
+tklabel5= Tkinter.Label(tab4,text="Arya Wiranata\t\t(05111540000163)",font=("arial",14,"bold")).pack()
 
 tabControl.pack(expand=1, fill="both")
 master.mainloop()
