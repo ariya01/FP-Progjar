@@ -22,6 +22,8 @@ email = ""
 passwd = ""
 server = ""
 attach = ""
+
+#Autentikasi
 def storeUser():
     global email
     global passwd
@@ -46,6 +48,7 @@ def storeUser():
         inbox()
         return email, server, passwd
 
+#fungsi inbox
 def inbox():
     global email
     global passwd
@@ -59,13 +62,14 @@ def inbox():
         process_mailbox(M)  # ... do something with emails, see below ...
         M.close()
 
+#tambah file
 def attachment():
     global attach
     attach = tkFileDialog.askopenfilename(parent=tab2, title='Choose a file')
     tkMessageBox.showinfo("Success", "File siap dikirim.")
     return attach
-        # print "I got %d bytes from this file." % len(data)
 
+#mengirim
 def send():
     global email
     global server
@@ -95,11 +99,8 @@ def send():
         msg.attach(part)
 
 
-
     text = msg.as_string()
 
-    # message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    # """ % (email, ", ".join(alamat), subject, pesan)
     try:
         server.sendmail(email, alamat, text)
 
@@ -118,7 +119,6 @@ def process_mailbox(M):
     if rv != 'OK':
         print "No messages found!"
         return
-    # full = daftarEmail.message_from_string(data[0][1])
     emailena = len(data[0].split()) - 7
     print emailena
     roww = 0
@@ -131,21 +131,13 @@ def process_mailbox(M):
 
         msg = daftarEmail.message_from_string(data[0][1])
 
-        # print msg
+        # Tab Inbox
         sender = Tkinter.Label(tab3, text='FROM:\t' + msg['From'], font=("arial", 10, "bold"))
         sender.grid(sticky=W)
         date = Tkinter.Label(tab3, text='DATE:\t' + msg['Date'], font=("arial", 6, "bold"))
         date.grid(sticky=W)
-        # enter = Tkinter.label
         content = Tkinter.Label(tab3, text='SUBJECT:\t' + msg['Subject'] + '\n', font=("arial", 8, "bold"))
         content.grid(sticky=W)
-        # msg.as_string()
-        # str(msg)
-        # print(str(msg))
-
-        # content2 = Tkinter.Label(tab3, text=str(msg) + '\n', font=("arial", 8, "bold"))
-        # content2.grid(sticky=W)
-
 
         ttk.Separator(tab3, orient='horizontal').grid(columnspan=2, sticky='ew')
         print 'Message %s: %s' % (num, msg['Subject'])
@@ -163,6 +155,8 @@ def process_mailbox(M):
 master= Tk()
 master.title('Email Application')
 master.geometry('500x500')
+
+#generate tab
 tabControl = ttk.Notebook(master)
 tab1 = ttk.Frame(tabControl)
 tab2 = ttk.Frame(tabControl)
@@ -173,7 +167,7 @@ tabControl.add(tab2, text='Send Email')
 tabControl.add(tab3, text='Inbox Email')
 tabControl.add(tab4, text='About')
 
-#TAB 1
+#TAB Auth
 loginTitle= Tkinter.Label(tab1,text="\n\n\n\nLOGIN EMAIL",font=("verdana",20,"bold")).pack()
 tklabel= Tkinter.Label(tab1,text="\nMasukan Email",font=("arial",14,"bold")).pack()
 T = Entry(tab1,width=30)
@@ -184,7 +178,7 @@ T1.pack()
 kosongan= Tkinter.Label(tab1,text="",font=("arial",14,"bold")).pack()
 work = Tkinter.Button(tab1,text = 'Login', bg='#2ecc71',command=storeUser,width=5,height=1).pack()
 
-#TAB 2
+#TAB Kirim Email
 loginTitle= Tkinter.Label(tab2,text="\nKirim Email Baru\n",font=("verdana",20,"bold")).pack()
 tklabel2= Tkinter.Label(tab2,text="Alamat Email Tujuan",font=("arial",14,"bold")).pack()
 T2 = Entry(tab2,width=30)
@@ -198,13 +192,10 @@ T3 = Text(tab2,width=40,height=10)
 T3.pack()
 work2 = Tkinter.Button(tab2,text = 'Attachment',bg='#2ecc71', command=attachment,width=5,height=1).pack()
 work2 = Tkinter.Button(tab2,text = 'Kirim',bg='#2ecc71', command=send,width=5,height=1).pack()
-# kosongan= Tkinter.Label(tab2,text="",font=("arial",14,"bold")).pack()
 
 #TAB ABOUT
-loginTitle= Tkinter.Label(tab4,text="\nABOUT\n",font=("verdana",20,"bold")).pack()
-img = ImageTk.PhotoImage(Image.open('tc.jpg'))
-# panel = Tkinter.Label(tab4, image = img).pack()
-
+loginTitle= Tkinter.Label(tab4,text="\n\n\nABOUT\n",font=("verdana",20,"bold")).pack()
+loginTitle= Tkinter.Label(tab4,text="PEMROGRAMAN JARINGAN E\n",font=("verdana",20,"bold")).pack()
 tklabel5= Tkinter.Label(tab4,text="Faturrahman M\t\t(05111540000027)",font=("arial",14,"bold")).pack()
 tklabel5= Tkinter.Label(tab4,text="Julian Enggarrio PP\t(05111540000082)",font=("arial",14,"bold")).pack()
 tklabel5= Tkinter.Label(tab4,text="Ariya Wildan Devanto\t(05111540000123)",font=("arial",14,"bold")).pack()
@@ -212,11 +203,6 @@ tklabel5= Tkinter.Label(tab4,text="Arya Wiranata\t\t(05111540000163)",font=("ari
 
 tabControl.pack(expand=1, fill="both")
 master.mainloop()
-
-formadd = "ariyadevanto@gmail.com"
-toaddd  = "wiranata.arya@gmail.com"
-message ="Hi i using pyhton"
-password = "ariyawildandevanto"
 
 server.quit()
 
